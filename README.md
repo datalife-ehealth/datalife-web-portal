@@ -12,15 +12,15 @@ auditable workflows for patient-authorized access, emergency access, and ledger
 verification without turning the browser into a second health-record system.
 
 > [!IMPORTANT]
-> This repository currently contains the project contract and community scaffold;
-> it does **not** yet contain a runnable web application. It is research software,
-> not a certified EHR or medical device, and must not be used for clinical care.
+> This repository contains an early, runnable Next.js application shell. Clinical
+> workflows are not available. It is research software, not a certified EHR or
+> medical device, and must not be used for clinical care.
 
 ## Project status
 
-**Scaffold / implementation lead wanted.** The system boundary and integration
-points below are ready for design review. Framework bootstrapping and product code
-should begin in a focused RFC or issue before a large pull request.
+**Application foundation.** The accessible Next.js shell, status page, and initial
+quality checks are in place. Clinical integrations require an agreed API contract
+and security review before implementation.
 
 ## Scope
 
@@ -83,8 +83,9 @@ and its threat model must be agreed upstream before record-viewing UI is connect
 - schema-generated API types once the core OpenAPI contract is stabilized
 - unit, accessibility, contract, and end-to-end tests in CI
 
-These are design constraints, not installed dependencies yet. Changes to the trust
-boundary require an RFC; implementation details can evolve through normal review.
+The current app uses TypeScript, React, and Next.js. Additional dependencies should
+be introduced with a focused use case and review. Changes to the trust boundary
+require an RFC; implementation details can evolve through normal review.
 
 ## Security and privacy invariants
 
@@ -101,19 +102,61 @@ boundary require an RFC; implementation details can evolve through normal review
 
 See [SECURITY.md](SECURITY.md) for private vulnerability reporting.
 
+### Dependency audit status
+
+The current npm audit reports five high-severity findings that all trace to the
+unpatched `braces` dependency used by `eslint-config-next` through `fast-glob` and
+`micromatch` ([GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm)).
+The registry currently publishes no `braces` release newer than `3.0.3`; npm's
+suggested automated fix downgrades `eslint-config-next` to 14.x.
+The project keeps its compatible Next.js 15 lint configuration and does not apply
+an unverified override. `npm audit --omit=dev` reports no production dependency
+vulnerabilities. Recheck the full audit when upstream publishes a patched release.
+
 ## Getting started
 
-There is no application runtime to install yet. To help shape the first milestone:
+### Prerequisites
+
+- Node.js 22
+- npm (the version bundled with Node.js 22)
+
+### Run locally
 
 ```bash
 git clone https://github.com/datalife-ehealth/datalife-web-portal.git
 cd datalife-web-portal
+npm ci
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in a browser. No environment
+variables are currently required; `.env.example` is provided as a template for
+future local configuration.
+
+### Application scripts
+
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Start the local development server. |
+| `npm run lint` | Run ESLint across the repository. |
+| `npm run typecheck` | Check TypeScript types without emitting files. |
+| `npm run test` | Run the Vitest suite once. |
+| `npm run test:watch` | Run Vitest in watch mode. |
+| `npm run build` | Create a production build. |
+| `npm start` | Serve the production build locally. |
+
+### Directory structure
+
+```text
+.github/workflows/  CI workflows
+public/             Static assets
+src/app/            Next.js routes, layout, fonts, and global styles
+src/components/ui/  Reusable page and shell components
+tests/              Unit and accessibility tests
 ```
 
 Then read [CONTRIBUTING.md](CONTRIBUTING.md), review the boundary above, and propose
-a small, testable first slice. Good first milestones include an accessible shell,
-an OpenAPI client generation spike, or a mocked OTP-validation flow using synthetic
-identifiers only.
+a small, testable slice. Use synthetic identifiers only in mocked workflows.
 
 ## Stewardship and contact
 
